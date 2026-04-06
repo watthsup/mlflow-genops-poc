@@ -23,10 +23,10 @@ graph TD
             GT -.-> UC_Vol
         end
 
-        subgraph Databricks Compute Clusters
-            Upload[Data Ingestion Job<br>Volume Batch Sync]:::databricks
-            Deploy[Model Registration Job<br>PyFunc Packager]:::databricks
-            Orch[GenOps Orchestrator<br>Evaluations & Inference]:::databricks
+        subgraph Databricks Workflows Layer
+            Upload[Data Ingestion Pipeline<br>Volume Batch Sync]:::databricks
+            Deploy[Model Release Trigger<br>PyFunc Packager]:::databricks
+            Orch[Daily KIE Pipeline DAG<br>Evaluations & Inference]:::databricks
         end
 
         subgraph MLflow Native Services
@@ -40,18 +40,20 @@ graph TD
         LLM[Azure OpenAI / LLMs<br>LangGraph Logic]
     end
 
-    %% Execution flow
-    Upload -- 1. Provisions Files --> UC_Vol
-    Deploy -- 2. Defines & Pushes --> UC_Reg
-    Orch -. 3. Resolves PyFunc .-> UC_Reg
-    Orch -- 4. Streams Data --> UC_Vol
+    %% Storage & Deployment flow
+    Upload -->|1. Provisions Files| UC_Vol
+    Deploy -->|2. Defines & Pushes PyFunc| UC_Reg
     
-    %% Model predict flow
-    Orch -- 5. Executes KIE --> ADE
-    Orch -- 6. Extracts JSON --> LLM
+    %% Daily DAG flow
+    Orch -->|3. Streams Data| UC_Vol
+    Orch -.->|4. Resolves & Instantiates| UC_Reg
+    
+    %% PyFunc logic execution
+    UC_Reg == 5. PyFunc logic triggers ==> ADE
+    UC_Reg == 6. PyFunc logic triggers ==> LLM
     
     %% Telemetry flow
-    Orch -- 7. Publishes Metrics/Tables --> Tracking
+    Orch -->|7. Publishes Metrics/Tables| Tracking
 ```
 
 ## Technology Stack

@@ -2,7 +2,7 @@ import os
 import logging
 from dotenv import load_dotenv
 from databricks.sdk import WorkspaceClient
-from databricks.sdk.service.jobs import Task, SparkPythonTask, GitSource, TaskDependency, JobCluster
+from databricks.sdk.service.jobs import Task, SparkPythonTask, TaskDependency, JobCluster
 
 load_dotenv()
 logging.basicConfig(
@@ -10,6 +10,9 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(name)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+# NOTE: Change this to match the folder path where you cloned the code in your Databricks Workspace
+WORKSPACE_BASE_PATH = "/Workspace/Users/your.email@company.com/mlflow-genpos-poc"
 
 def get_shared_cluster_spec(key: str) -> JobCluster:
     return JobCluster(
@@ -27,7 +30,7 @@ def get_shared_cluster_spec(key: str) -> JobCluster:
         }
     )
 
-def create_inference_dag(w: WorkspaceClient, git_source: GitSource):
+def create_inference_dag(w: WorkspaceClient):
     """
     DAG 1: Designed to be triggered by Azure Storage events (when new files arrive).
     Will execute KIE Inference and store logs.
@@ -41,15 +44,14 @@ def create_inference_dag(w: WorkspaceClient, git_source: GitSource):
         description="Triggered by Azure Storage. Executes inference against specific new patient data.",
         job_cluster_key=cluster_key,
         spark_python_task=SparkPythonTask(
-            python_file="dags/inference_job.py", 
-            source="GIT"
+            python_file=f"{WORKSPACE_BASE_PATH}/dags/inference_job.py", 
+            source="WORKSPACE"
         )
     )
 
     try:
         job = w.jobs.create(
             name="DAG_1_Inference_Event_Trigger",
-            git_source=git_source,
             job_clusters=[get_shared_cluster_spec(cluster_key)],
             tasks=[task_infer]
         )
@@ -57,7 +59,7 @@ def create_inference_dag(w: WorkspaceClient, git_source: GitSource):
     except Exception as e:
         logger.error(f"Failed to create Inference DAG: {e}")
 
-def create_evaluation_dag(w: WorkspaceClient, git_source: GitSource):
+def create_evaluation_dag(w: WorkspaceClient):
     """
     DAG 2: Designed to be run manually or automatically via CI/CD redeployment.
     Deploys the model PyFunc and evaluates it against standard ground truth.
@@ -70,8 +72,8 @@ def create_evaluation_dag(w: WorkspaceClient, git_source: GitSource):
         description="Registers the core AI extraction logic to Unity Catalog.",
         job_cluster_key=cluster_key,
         spark_python_task=SparkPythonTask(
-            python_file="deploy_model.py", 
-            source="GIT"
+            python_file=f"{WORKSPACE_BASE_PATH}/deploy_model.py", 
+            source="WORKSPACE"
         )
     )
     
@@ -82,15 +84,14 @@ def create_evaluation_dag(w: WorkspaceClient, git_source: GitSource):
         depends_on=[TaskDependency(task_key="Deploy_PyFunc_Model")],
         job_cluster_key=cluster_key,
         spark_python_task=SparkPythonTask(
-            python_file="dags/evaluation_job.py",
-            source="GIT"
+            python_file=f"{WORKSPACE_BASE_PATH}/dags/evaluation_job.py",
+            source="WORKSPACE"
         )
     )
 
     try:
         job = w.jobs.create(
             name="DAG_2_Evaluation_And_Deploy",
-            git_source=git_source,
             job_clusters=[get_shared_cluster_spec(cluster_key)],
             tasks=[task_deploy, task_eval]
         )
@@ -106,14 +107,8 @@ if __name__ == "__main__":
         logger.error(f"Failed to connect. Check DATABRICKS_HOST in .env: {e}")
         exit(1)
 
-    git_source = GitSource(
-        git_url="https://github.com/watthsup/mlflow-genpos-poc.git",
-        git_provider="gitHub",
-        git_branch="main"
-    )
-
     logger.info("==== Building DAG 1 (Triggered Inference) ====")
-    create_inference_dag(w, git_source)
+    create_inference_dag(w)
     
     logger.info("==== Building DAG 2 (CI/CD Evaluation & Deployment) ====")
-    create_evaluation_dag(w, git_source)
+    create_evaluation_dag(w)

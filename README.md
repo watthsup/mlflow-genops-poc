@@ -6,7 +6,55 @@ This architecture leverages a custom `mlflow.pyfunc.PythonModel` to decouple Mod
 
 ---
 
-## Architecture Stack
+## System Architecture (Databricks GenOps)
+
+```mermaid
+graph TD
+    classDef databricks fill:#ff3621,color:white,stroke:none,font-weight:bold
+    classDef storage fill:#00a39d,color:white,stroke:none
+    classDef default fill:#f4f4f4,stroke:#ccc
+    
+    subgraph External Systems
+        ADE[Azure Document Intelligence<br>OCR Engine]
+        LLM[Azure OpenAI / LLMs<br>LangGraph Logic]
+    end
+
+    subgraph Databricks Environment
+        subgraph Databricks Storage Layer
+            UC_Vol[Unity Catalog Volumes<br>/Volumes/catalog/schema/...]:::storage
+            Images[(Raw Medical Images)]:::storage
+            GT[(Ground Truth JSON)]:::storage
+            Images -.-> UC_Vol
+            GT -.-> UC_Vol
+        end
+
+        subgraph Databricks Compute Clusters
+            Upload[upload_dataset.py<br>Batch Ingestion Job]:::databricks
+            Deploy[deploy_model.py<br>Model Packager]:::databricks
+            Orch[main.py Orchestrator<br>Evaluations & Inference]:::databricks
+        end
+
+        subgraph MLflow Native Services
+            UC_Reg[(Unity Catalog Registry<br>Registered PyFunc Models)]
+            Tracking[(MLflow Tracking API<br>Experiments & Artifacts)]
+        end
+    end
+
+    %% Execution flow
+    Upload -- 1. Provisions Files --> UC_Vol
+    Deploy -- 2. Defines & Pushes --> UC_Reg
+    Orch -. 3. Resolves PyFunc .-> UC_Reg
+    Orch -- 4. Streams Data --> UC_Vol
+    
+    %% Model predict flow
+    Orch -- 5. Executes KIE --> ADE
+    Orch -- 6. Extracts JSON --> LLM
+    
+    %% Telemetry flow
+    Orch -- 7. Publishes Metrics/Tables --> Tracking
+```
+
+## Technology Stack
 * **Language:** Python 3.10+
 * **MLOps Platform:** Databricks (Targeting `databricks-uc` registry)
 * **Core Framework:** MLflow (`pyfunc`, `log_table`, `log_dict`, custom tracing)

@@ -14,11 +14,6 @@ graph TD
     classDef storage fill:#00a39d,color:white,stroke:none
     classDef default fill:#f4f4f4,stroke:#ccc
     
-    subgraph External Systems
-        ADE[Azure Document Intelligence<br>OCR Engine]
-        LLM[Azure OpenAI / LLMs<br>LangGraph Logic]
-    end
-
     subgraph Databricks Environment
         subgraph Databricks Storage Layer
             UC_Vol[Unity Catalog Volumes<br>/Volumes/catalog/schema/...]:::storage
@@ -38,6 +33,11 @@ graph TD
             UC_Reg[(Unity Catalog Registry<br>Registered PyFunc Models)]
             Tracking[(MLflow Tracking API<br>Experiments & Artifacts)]
         end
+    end
+
+    subgraph External Systems
+        ADE[Azure Document Intelligence<br>OCR Engine]
+        LLM[Azure OpenAI / LLMs<br>LangGraph Logic]
     end
 
     %% Execution flow

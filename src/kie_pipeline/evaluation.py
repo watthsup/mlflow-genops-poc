@@ -9,7 +9,7 @@ def run_evaluation_pipeline(model_uri: str, dataset: List[Dict], prompt_ver: str
     """
     Evaluates the PyFunc model against a ground truth dataset, computing field-level metrics.
     """
-    mlflow.set_experiment("KIE_Evaluation_Dev")
+    mlflow.set_experiment("I042170_KIE_Evaluation_Dev")
     with mlflow.start_run(run_name=f"Eval_Prompt_{prompt_ver}"):
         logger.info(f"--- Starting Evaluation using Model: {model_uri} ---")
         mlflow.log_param("prompt_version", prompt_ver)

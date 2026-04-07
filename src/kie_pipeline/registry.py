@@ -12,7 +12,7 @@ def log_and_register_model() -> str:
     """
     # Databricks requires experiments to be housed within a Workspace or Repos path. 
     # Modify this if you wish to use a shared folder instead of a personal one.
-    mlflow.set_experiment("/Shared/KIE_Model_Registry_Dev")
+    mlflow.set_experiment("/Shared/I042170_KIE_Model_Registry_Dev")
     
     uc_catalog = os.getenv("UC_CATALOG", "main")
     uc_schema = os.getenv("UC_SCHEMA", "default")

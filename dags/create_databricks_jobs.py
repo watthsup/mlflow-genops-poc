@@ -12,7 +12,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # NOTE: Change this to match the folder path where you cloned the code in your Databricks Workspace
-WORKSPACE_BASE_PATH = "/Workspace/Users/your.email@company.com/mlflow-genpos-poc"
+WORKSPACE_BASE_PATH = "/Workspace/Users/your.email@company.com/mlflow-genops-poc"
 
 def get_shared_cluster_spec(key: str) -> JobCluster:
     return JobCluster(

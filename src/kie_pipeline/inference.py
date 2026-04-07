@@ -10,7 +10,7 @@ def run_batch_inference_pipeline(model_uri: str, unseen_images: List[str]) -> No
     Runs batch inference on a set of unseen images and persists the extracted JSON 
     directly to MLflow artifacts without hitting the local filesystem.
     """
-    mlflow.set_experiment("KIE_Batch_Inference_Dev")
+    mlflow.set_experiment("I042170_KIE_Batch_Inference_Dev")
     with mlflow.start_run(run_name="Scheduled_Batch_Inference"):
         logger.info(f"--- Starting Batch Inference using Model: {model_uri} ---")
         mlflow.log_param("num_images_processed", len(unseen_images))

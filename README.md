@@ -71,8 +71,8 @@ MLFLOW_TRACKING_URI=databricks
 DATABRICKS_HOST=https://<your-databricks-workspace-url>
 DATABRICKS_TOKEN=<your-personal-access-token>
 
-UC_CATALOG=main
-UC_SCHEMA=default
+UC_CATALOG=wks_aisd
+UC_SCHEMA=kie_project
 UC_MODEL_NAME=kie_pipeline_model
 ```
 

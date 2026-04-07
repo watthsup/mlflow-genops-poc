@@ -22,8 +22,8 @@ def get_shared_cluster_spec(key: str) -> JobCluster:
             "node_type_id": "Standard_DS3_v2",          # Azure Default Small Node
             "num_workers": 1,
             "spark_env_vars": {
-                "UC_CATALOG": os.getenv("UC_CATALOG", "main"),
-                "UC_SCHEMA": os.getenv("UC_SCHEMA", "default"),
+                "UC_CATALOG": os.getenv("UC_CATALOG", "wks_aisd"),
+                "UC_SCHEMA": os.getenv("UC_SCHEMA", "kie_project"),
                 "UC_MODEL_NAME": os.getenv("UC_MODEL_NAME", "kie_pipeline_model"),
                 "MODEL_URI": os.getenv("MODEL_URI", "")
             }

@@ -14,8 +14,8 @@ def log_and_register_model() -> str:
     # Modify this if you wish to use a shared folder instead of a personal one.
     mlflow.set_experiment("/Shared/I042170_KIE_Model_Registry_Dev")
     
-    uc_catalog = os.getenv("UC_CATALOG", "main")
-    uc_schema = os.getenv("UC_SCHEMA", "default")
+    uc_catalog = os.getenv("UC_CATALOG", "wks_aisd")
+    uc_schema = os.getenv("UC_SCHEMA", "kie_project")
     uc_model_name = os.getenv("UC_MODEL_NAME", "kie_pipeline_model")
     full_model_name = f"{uc_catalog}.{uc_schema}.{uc_model_name}"
 

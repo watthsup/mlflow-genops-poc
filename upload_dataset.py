@@ -26,9 +26,9 @@ def main():
         return
 
     # Configuration for targeting Unity Catalog Volume
-    catalog = os.getenv("UC_CATALOG", "main")
-    schema = os.getenv("UC_SCHEMA", "default")
-    volume_name = "kie_medical_dataset"
+    catalog = os.getenv("UC_CATALOG", "wks_aisd")
+    schema = os.getenv("UC_SCHEMA", "kie_project")
+    volume_name = "kie_dataset"
     
     # Native Unity Catalog Volume path format
     volume_path = f"/Volumes/{catalog}/{schema}/{volume_name}"
@@ -124,7 +124,7 @@ def main():
         logger.error(f"Failed to upload ground truth: {e}")
     
     logger.info("==== Upload Utility Complete! ====")
-    logger.info("Go to: Data Space -> Catalog -> main -> default -> kie_medical_dataset to view files in DB UI!")
+    logger.info("Go to: Data Space -> Catalog -> wks_aisd -> kie_project -> kie_dataset to view files in DB UI!")
 
 if __name__ == "__main__":
     main()

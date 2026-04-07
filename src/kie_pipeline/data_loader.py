@@ -9,9 +9,9 @@ def fetch_volume_dataset(mode="evaluate"):
     """Reads dataset dynamically from Databricks Unity Catalog Volumes."""
     try:
         w = WorkspaceClient()
-        catalog = os.getenv("UC_CATALOG", "main")
-        schema = os.getenv("UC_SCHEMA", "default")
-        volume_name = "kie_medical_dataset" # Should match upload_dataset.py
+        catalog = os.getenv("UC_CATALOG", "wks_aisd")
+        schema = os.getenv("UC_SCHEMA", "kie_project")
+        volume_name = "kie_dataset" # Should match upload_dataset.py
         base_path = f"/Volumes/{catalog}/{schema}/{volume_name}"
 
         if mode == "inference":
